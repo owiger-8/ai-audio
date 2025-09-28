@@ -40,7 +40,7 @@ except Exception as e:
 # --- 2. Set the Path to Your Recorded Audio File 🎤 ---
 # IMPORTANT: Replace this with the path to a .wav file you want to test.
 # This file should NOT have been in your original 'real' or 'fake' training folders.
-AUDIO_FILE_PATH = "path/to/your/recorded_audio.wav" 
+AUDIO_FILE_PATH = "./1.wav" 
 
 if not os.path.exists(AUDIO_FILE_PATH):
     print(f"Error: Audio file not found at '{AUDIO_FILE_PATH}'")
