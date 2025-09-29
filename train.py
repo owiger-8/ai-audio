@@ -1,70 +1,72 @@
-import json
 import numpy as np
-from sklearn.model_selection import train_test_split
 import tensorflow as tf
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Dropout, BatchNormalization
+from tensorflow.keras.layers import LSTM, Dense, Dropout
+from sklearn.model_selection import train_test_split
+import os
+import librosa
 
-features_list = []
-labels_list = [] # This will initially hold string labels "real" and "fake"
+# --- Settings ---
+DATA_PATH = "." 
+SEQUENCE_LENGTH = 10 # Number of chunks in a sequence
+FEATURES_PER_CHUNK = 42 # 40 MFCCs + 1 pitch + 1 zcr
 
-# --- 1. Load Data from JSON Lines file ---
-print("Loading features from .jsonl file...")
-with open("features.jsonl", 'r') as f:
-    for line in f:
-        data = json.loads(line)
-        features_list.append(data["features"])
-        labels_list.append(data["label"])
+# --- Feature Extraction (same as before) ---
+def extract_features(audio_chunk, sr=22050):
+    mfccs = np.mean(librosa.feature.mfcc(y=audio_chunk, sr=sr, n_mfcc=40).T, axis=0)
+    pitches, magnitudes = librosa.piptrack(y=audio_chunk, sr=sr)
+    pitch = np.mean(pitches[magnitudes > np.median(magnitudes)]) if np.any(magnitudes) else 0
+    zcr = np.mean(librosa.feature.zero_crossing_rate(y=audio_chunk))
+    return np.hstack((mfccs, pitch, zcr))
 
-# Convert features to a NumPy array
-X = np.array(features_list)
+# --- Data Preparation for Sequences ---
+print("Preparing sequence data...")
+X, y = [], []
+labels = {'real': 0, 'fake': 1}
 
-# --- Convert string labels to numbers (Label Encoding) ---
-# We map "real" to 0 and "fake" to 1.
-y = np.array([0 if label == 'real' else 1 for label in labels_list])
+for label, numeric_label in labels.items():
+    folder_path = os.path.join(DATA_PATH, label)
+    for filename in os.listdir(folder_path):
+        if filename.endswith(".wav"):
+            file_path = os.path.join(folder_path, filename)
+            audio, sr = librosa.load(file_path, sr=22050)
+            
+            # Chop audio into chunks and create sequences
+            chunk_size = sr // 2 # 0.5 second chunks
+            num_chunks = len(audio) // chunk_size
+            
+            for i in range(0, num_chunks - SEQUENCE_LENGTH, SEQUENCE_LENGTH // 2): # Overlapping sequences
+                sequence = []
+                for j in range(SEQUENCE_LENGTH):
+                    chunk = audio[(i+j)*chunk_size : (i+j+1)*chunk_size]
+                    features = extract_features(chunk, sr)
+                    sequence.append(features)
+                X.append(sequence)
+                y.append(numeric_label)
 
-print(f"Data loaded and labels encoded: {len(X)} samples.")
+X = np.array(X)
+y = np.array(y)
 
-# --- 2. Split Data for Training and Testing ---
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-print(f"Data split into {len(X_train)} training and {len(X_test)} testing samples.")
+print(f"Data prepared. Shape of training data: {X_train.shape}")
 
-# --- 3. Build the Deep Learning Model ---
+# --- Build the LSTM Model ---
+print("Building LSTM model...")
 model = Sequential([
-    Dense(128, input_shape=(X_train.shape[1],), activation='relu'),
-    BatchNormalization(),
-    Dropout(0.5),
-    
-    Dense(64, activation='relu'),
-    BatchNormalization(),
-    Dropout(0.5),
-    
-    Dense(32, activation='relu'),
-    
+    LSTM(64, return_sequences=True, input_shape=(SEQUENCE_LENGTH, FEATURES_PER_CHUNK)),
+    Dropout(0.3),
+    LSTM(32),
+    Dropout(0.3),
+    Dense(16, activation='relu'),
     Dense(1, activation='sigmoid')
 ])
 
-# Compile the model
-model.compile(optimizer='adam',
-              loss='binary_crossentropy',
-              metrics=['accuracy'])
-
+model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 model.summary()
 
-# --- 4. Train the Model ---
-print("\nStarting model training...")
-history = model.fit(X_train, y_train,
-                    epochs=200,
-                    batch_size=32,
-                    validation_split=0.1,
-                    verbose=1)
+# --- Train the Model ---
+print("Training model...")
+model.fit(X_train, y_train, epochs=50, batch_size=16, validation_data=(X_test, y_test))
 
-print("Model training complete.")
-
-# --- 5. Evaluate the Model on Unseen Data ---
-loss, accuracy = model.evaluate(X_test, y_test)
-print(f"\nModel Accuracy on Test Data: {accuracy*100:.2f}%")
-
-# --- 6. Save the Trained Model ---
-model.save("voice_detector_model.h5")
-print(f"\n✅ Model saved to voice_detector_model.h5")
+model.save("voice_detector_lstm.keras")
+print("✅ LSTM Model saved to voice_detector_lstm.keras")

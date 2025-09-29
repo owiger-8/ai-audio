@@ -20,7 +20,6 @@ def extract_features(file_path):
         
     except Exception as e:
         print(f"Error processing {file_path}: {e}")
-        return None
 
 ## 2. Load the Trained Model
 # Make sure the filename matches the one you saved (e.g., .h5 or .keras)
