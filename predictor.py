@@ -3,10 +3,8 @@ import librosa
 import tensorflow as tf
 import os
 
-# --- This function must be IDENTICAL to the logic used for training ---
-# It takes a whole audio file and averages its features into a single fingerprint.
 def extract_features(file_path):
-    """Extracts a fixed-size feature vector from an audio file."""
+ 
     try:
         audio, sample_rate = librosa.load(file_path, res_type='kaiser_fast', sr=22050)
         
@@ -23,7 +21,6 @@ def extract_features(file_path):
         print(f"Error processing {file_path}: {e}")
         return None
 
-# --- 1. Load the Trained Model ---
 MODEL_PATH = "voice_detector_model.h5"
 if not os.path.exists(MODEL_PATH):
     print(f"Error: Model file not found at '{MODEL_PATH}'")
@@ -37,10 +34,7 @@ except Exception as e:
     print(f"Error loading model: {e}")
     exit()
 
-# --- 2. Set the Path to Your Recorded Audio File 🎤 ---
-# IMPORTANT: Replace this with the path to a .wav file you want to test.
-# This file should NOT have been in your original 'real' or 'fake' training folders.
-AUDIO_FILE_PATH = "./1.wav" 
+AUDIO_FILE_PATH = "./2.wav" 
 
 if not os.path.exists(AUDIO_FILE_PATH):
     print(f"Error: Audio file not found at '{AUDIO_FILE_PATH}'")
