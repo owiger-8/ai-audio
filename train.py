@@ -54,7 +54,7 @@ model.summary()
 # --- 4. Train the Model ---
 print("\nStarting model training...")
 history = model.fit(X_train, y_train,
-                    epochs=50,
+                    epochs=200,
                     batch_size=32,
                     validation_split=0.1,
                     verbose=1)

@@ -28,21 +28,28 @@ print(f"Starting incremental feature extraction. Output will be saved to {output
 # Open the output file in write mode ('w') to start a fresh file
 with open(output_filename, 'w') as f:
     # Process real voices (label = "real")
+    c = 0
     print("Processing real voices...")
     for filename in os.listdir(real_path):
+        c = c + 1
         if filename.endswith(".wav"):
             path = os.path.join(real_path, filename)
             features = extract_features(path)
+            print("writing " , c)
             if features is not None:
+                
                 record = {"features": features, "label": "real"}
                 f.write(json.dumps(record) + '\n')
 
     # Process AI voices (label = "fake")
+    c = 0
     print("Processing AI voices...")
     for filename in os.listdir(ai_path):
+        c = c +1
         if filename.endswith(".wav"):
             path = os.path.join(ai_path, filename)
             features = extract_features(path)
+            print("writing " , c)
             if features is not None:
                 record = {"features": features, "label": "fake"}
                 f.write(json.dumps(record) + '\n')
