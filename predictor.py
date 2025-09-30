@@ -24,10 +24,9 @@ def extract_features(file_path):
 MODEL_PATH = "voice_detector_model.h5"
 if not os.path.exists(MODEL_PATH):
     print(f"Error: Model file not found at '{MODEL_PATH}'")
-    print("Please run the training script first to create the model.")
     exit()
 
-print(f"Loading trained model from {MODEL_PATH}...")
+print(f"Loading trained model from {MODEL_PATH}")
 try:
     model = tf.keras.models.load_model(MODEL_PATH)
 except Exception as e:
@@ -40,25 +39,25 @@ if not os.path.exists(AUDIO_FILE_PATH):
     print(f"Error: Audio file not found at '{AUDIO_FILE_PATH}'")
     exit()
 
-# --- 3. Make a Prediction ---
+
 print(f"\nProcessing audio file: {os.path.basename(AUDIO_FILE_PATH)}")
 features = extract_features(AUDIO_FILE_PATH)
 
 if features is not None:
-    # Reshape features to match the model's input format (1 sample, N features)
+
     features = np.reshape(features, (1, -1))
 
-    # Get the model's prediction
+
     prediction = model.predict(features)
-    confidence = prediction[0][0] # The output is a probability between 0 and 1
+    confidence = prediction[0][0] 
 
     print("\n--- Prediction Result ---")
-    # Your model was trained with 'real' as 0 and 'fake' as 1
+
     if confidence > 0.5:
-        print(f"🚨  Prediction: AI Voice (Fake)")
+        print(f"  Prediction: AI Voice (Fake)")
         print(f"   Confidence: {confidence * 100:.2f}%")
     else:
-        print(f"✅  Prediction: Real Voice")
+        print(f"  Prediction: Real Voice")
         print(f"   Confidence: {(1 - confidence) * 100:.2f}%")
 else:
     print("Could not extract features from the audio file.")
