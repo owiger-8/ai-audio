@@ -1,10 +1,10 @@
-#AI Voice Detection System 🤖
+# AI Voice Detection System 🤖
 
 This project is a machine learning system built to distinguish between real human speech and synthetic, AI-generated voices from audio recordings. By analyzing key acoustic features, the model learns to identify the subtle patterns that separate authentic voices from deepfakes, helping to flag potential fraud.
 
 This system uses a Multi-Layer Perceptron (MLP), a type of deep learning model, to classify audio files.
 
-##🚀 Features
+##  Features
 Audio Feature Extraction: Automatically processes a directory of .wav files and extracts a numerical "fingerprint" from each one using Librosa. Key features include:
 
 Mel-Frequency Cepstral Coefficients (MFCCs)
@@ -17,7 +17,7 @@ Model Training: Trains a TensorFlow/Keras neural network on the extracted featur
 
 Prediction: Provides a simple script to load the trained model and instantly classify a new, unseen audio file.
 
-##🛠️ Tech Stack
+## Tech Stack
 Language: Python 3
 
 Machine Learning: TensorFlow (Keras)
@@ -50,10 +50,10 @@ Place your .wav files of real human voices into the real folder.
 
 Place your .wav files of AI-generated voices into the fake folder.
 
-##🏃‍♂️ How to Run the Project
+## How to Run the Project
 This project runs in three simple steps.
 
-###Step 1: Extract Features
+### Step 1: Extract Features
 First, run the extraction script. This will process all your audio files in the real/ and fake/ folders and create a single features.jsonl file that contains all the numerical data for training.
 
 Bash
@@ -61,7 +61,7 @@ Bash
 python 1_extract_features.py
 (This script is the 1_extract_features_incremental.py we built earlier, renamed for clarity.)
 
-###Step 2: Train the Model
+### Step 2: Train the Model
 Next, run the training script. This loads features.jsonl, builds the MLP model, trains it, and saves the final, trained model as voice_detector_model.h5.
 
 Bash
@@ -69,7 +69,7 @@ Bash
 python 2_train_mlp.py
 (This is the training script you provided in our conversation.)
 
-###Step 3: Make a Prediction
+### Step 3: Make a Prediction
 Finally, you can use your new model to test any audio file.
 
 Open the 3_predict_file.py script in your editor.
@@ -78,7 +78,7 @@ Change the AUDIO_FILE_PATH variable to the path of the .wav file you want to tes
 
 Python
 
-# e.g.,
+ e.g.,
 AUDIO_FILE_PATH = "C:/Users/YourUser/Desktop/test_call.wav"
 Run the script:
 
@@ -87,7 +87,7 @@ Bash
 python 3_predict_file.py
 You will see the model's prediction and its confidence in the terminal.
 
-##📂 Project Structure
+##  Project Structure
 ai-voice-detector/
 │
 ├── real/                   # Folder for real .wav files
