@@ -5,28 +5,29 @@ This project is a machine learning system built to distinguish between real huma
 This system uses a Multi-Layer Perceptron (MLP), a type of deep learning model, to classify audio files.
 
 ##  Features
-Audio Feature Extraction: Automatically processes a directory of .wav files and extracts a numerical "fingerprint" from each one using Librosa. Key features include:
+* Audio Feature Extraction: Automatically processes a directory of .wav files and extracts a numerical "fingerprint" from each one using Librosa.
+   Key features include:
 
-Mel-Frequency Cepstral Coefficients (MFCCs)
+   * Mel-Frequency Cepstral Coefficients (MFCCs)
+   
+   * Pitch (Fundamental Frequency)
+   
+   * Zero-Crossing Rate (ZCR)
 
-Pitch (Fundamental Frequency)
+* Model Training: Trains a TensorFlow/Keras neural network on the extracted features to perform binary classification (real vs. fake).
 
-Zero-Crossing Rate (ZCR)
-
-Model Training: Trains a TensorFlow/Keras neural network on the extracted features to perform binary classification (real vs. fake).
-
-Prediction: Provides a simple script to load the trained model and instantly classify a new, unseen audio file.
+* Prediction: Provides a simple script to load the trained model and instantly classify a new, unseen audio file.
 
 ## Tech Stack
-Language: Python 3
+** Language ** : Python 3
 
-Machine Learning: TensorFlow (Keras)
+** Machine Learning ** : TensorFlow (Keras)
 
-Audio Processing: Librosa
+** Audio Processing ** : Librosa
 
-Data Handling: NumPy, Scikit-learn (for splitting data)
+** Data Handling ** : NumPy, Scikit-learn (for splitting data)
 
-##⚙️ Installation & Setup
+##  Installation & Setup
 Clone the repository (or download the files):
 
 Bash
