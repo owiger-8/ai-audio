@@ -66,7 +66,7 @@ Bash
    ```
 python extract.py
 ```
-(This script is the 1_extract_features_incremental.py we built earlier, renamed for clarity.)
+
 
 ### Step 2: Train the Model
 Next, run the training script. This loads features.jsonl, builds the MLP model, trains it, and saves the final, trained model as voice_detector_model.h5.
@@ -75,12 +75,12 @@ Bash
 ```
 python train.py
 ```
-(This is the training script you provided in our conversation.)
+
 
 ### Step 3: Make a Prediction
 Finally, you can use your new model to test any audio file.
 
-Open the 3_predict_file.py script in your editor.
+Open the predictor.py script in your editor.
 
 Change the AUDIO_FILE_PATH variable to the path of the .wav file you want to test.
 
