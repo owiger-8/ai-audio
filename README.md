@@ -1,127 +1,97 @@
-# AI Voice Detection System 🤖
+# AI Voice Detection System
 
-This project is a machine learning system built to distinguish between real human speech and synthetic, AI-generated voices from audio recordings. By analyzing key acoustic features, the model learns to identify the subtle patterns that separate authentic voices from deepfakes, helping to flag potential fraud.
+A machine learning classification pipeline designed to distinguish between authentic human speech and synthetic, AI-generated voice recordings. By extracting acoustic feature representations, the system identifies spectral and temporal anomalies characteristic of audio deepfakes.
 
-This system uses a Multi-Layer Perceptron (MLP), a type of deep learning model, to classify audio files.
+## Architectural Overview
 
-##  Features
-* Audio Feature Extraction: Automatically processes a directory of .wav files and extracts a numerical "fingerprint" from each one using Librosa.
-   Key features include:
+The system processes raw waveform data through a three-stage pipeline: feature extraction, vector serialization via JSON Lines, and binary classification using a Multi-Layer Perceptron (MLP) built with TensorFlow/Keras.
 
-   * Mel-Frequency Cepstral Coefficients (MFCCs)
-   
-   * Pitch (Fundamental Frequency)
-   
-   * Zero-Crossing Rate (ZCR)
+### Feature Extraction Pipeline
+Audio files located within the target directories are processed using `librosa` to compute the following numerical representations:
+- **Mel-Frequency Cepstral Coefficients (MFCCs):** Captures the short-term power spectrum of the audio, characterizing the vocal tract shape.
+- **Pitch (Fundamental Frequency):** Tracks tonal variations and detects unnatural monotony or robotic periodicity typical of low-quality synthesis.
+- **Zero-Crossing Rate (ZCR):** Measures the rate of sign-changes along the signal waveform, quantifying high-frequency noise components.
 
-* Model Training: Trains a TensorFlow/Keras neural network on the extracted features to perform binary classification (real vs. fake).
+## Technology Stack
 
-* Prediction: Provides a simple script to load the trained model and instantly classify a new, unseen audio file.
+- **Language:** Python 3
+- **Deep Learning Framework:** TensorFlow / Keras
+- **Signal Processing:** Librosa
+- **Data Preprocessing:** NumPy, Scikit-learn
 
-## Tech Stack
-**Language** : Python 3
+## Installation & Setup
 
-**Machine Learning** : TensorFlow (Keras)
-
-**Audio Processing** : Librosa
-
-**Data Handling** : NumPy, Scikit-learn (for splitting data)
-
-##  Installation & Setup
-### 1.Clone the repository (or download the files):
-
-Bash
-
-```
-git clone https://your-repo-url.git
-cd ai-voice-detector
-
+### 1. Clone the Repository
+```bash
+git clone https://github.com/owiger-8/ai-audio.git
+cd ai-audio
 ```
 
-### 2.Install the required Python libraries:
-
-Bash
-```
+### 2. Install Dependencies
+```bash
 pip install tensorflow numpy librosa scikit-learn
 ```
-### 3.Create your dataset folders: In your main project directory, create two folders:
 
->real
+### 3. Initialize Directory Structure
+Create the designated data directories in the root of the project workspace:
+```bash
+mkdir real fake
+```
 
->fake
+### 4. Populate Dataset
+- Place authentic `.wav` speech files into the `real/` directory.
+- Place synthetic/deepfake `.wav` files into the `fake/` directory.
 
-### 4.Add your data:
+## Execution Workflow
 
-Place your .wav files of real human voices into the real folder.
-
-Place your .wav files of AI-generated voices into the fake folder.
-
-# How to Run the Project
-This project runs in three simple steps.
-
-### Step 1: Extract Features
-First, run the extraction script. This will process all your audio files in the real/ and fake/ folders and create a single features.jsonl file that contains all the numerical data for training.
-
-Bash
-   ```
+### Step 1: Feature Extraction
+Execute the extraction module to process raw waveforms and serialize the extracted feature matrices into a structured JSONL file.
+```bash
 python extract.py
 ```
 
-
-### Step 2: Train the Model
-Next, run the training script. This loads features.jsonl, builds the MLP model, trains it, and saves the final, trained model as voice_detector_model.h5.
-
-Bash
-```
+### Step 2: Model Training
+Compile and train the MLP binary classifier using the extracted feature dataset. The resulting model weights are serialized and saved.
+```bash
 python train.py
 ```
+*Output Artifact:* `voice_detector_model.h5`
 
+### Step 3: Inference and Evaluation
+Configure the target file path in `predictor.py` and execute the inference script to evaluate an unseen audio sample.
 
-### Step 3: Make a Prediction
-Finally, you can use your new model to test any audio file.
-
-Open the predictor.py script in your editor.
-
-Change the AUDIO_FILE_PATH variable to the path of the .wav file you want to test.
-
-Python
-
- e.g.,
- ```
+```python
+# predictor.py configuration example
 AUDIO_FILE_PATH = "C:/Users/YourUser/Desktop/test_call.wav"
 ```
-Run the script:
 
-Bash
-```
+```bash
 python predict.py
 ```
-You will see the model's prediction and its confidence in the terminal.
 
-##  Project Structure
-```
-ai-voice-detector/
+## Project Directory Structure
+
+```text
+ai-audio/
 │
-├── real/                   # Folder for real .wav files
+├── real/                     # Directory for authentic .wav samples
 │   ├── real_audio_1.wav
 │   └── ...
 │
-├── fake/                   # Folder for fake .wav files
+├── fake/                     # Directory for synthetic .wav samples
 │   ├── fake_audio_1.wav
 │   └── ...
 │
-├── extract.py   # Script to process audio and create features.jsonl
-├── train.py          # Script to train the model from features.jsonl
-├── predictor.py       # Script to test a new audio file
+├── extract.py                # Feature extraction and JSONL serialization module
+├── train.py                  # MLP network compilation and training module
+├── predictor.py              # Inference script for out-of-sample evaluation
 │
-├── features.jsonl          # (Generated by script 1)
-└── voice_detector_model.h5 # (Generated by script 2)
-
+├── features.jsonl            # Serialized feature vectors (Generated by Step 1)
+└── voice_detector_model.h5   # Trained neural network weights (Generated by Step 2)
 ```
-# Future Improvements
 
-Implement Real-Time Analysis: Adapt the project with sounddevice to classify live audio streams.
+## Future Technical Iterations
 
-Try Different Models: Experiment with an SVM (Support Vector Machine) or an LSTM (Long Short-Term Memory) network to handle audio as a sequence.
-
-Expand Dataset: Add more, diverse audio samples (different speakers, accents, AI services) and use data augmentation to improve model robustness.
+- **Real-Time Stream Processing:** Integrate `sounddevice` to buffer and classify live audio streams.
+- **Alternative Classifiers:** Migrate to a Support Vector Machine (SVM) or Sequence-based Recurrent Architectures (LSTM/GRU) to model temporal dependencies.
+- **Robustness Enhancement:** Introduce data augmentation pipelines (`audiomentations`) to handle varied acoustic environments and signal degradation.
